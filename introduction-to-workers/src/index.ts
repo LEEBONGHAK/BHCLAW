@@ -11,8 +11,11 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
+let count = 0;
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		return new Response('Hello World!');
+		count = count + 1;
+		return new Response(`Count is ${count}!`);
 	},
 } satisfies ExportedHandler<Env>;
