@@ -141,3 +141,8 @@ this.ctx.blockConcurrencyWhile(async () => {
 ### Data Explorer
 
 Durable Objects의 스토리지가 각 인스턴스마다 따로 있고, 각 durable object들끼리는 서로 격리되어 있음
+
+### Alarms
+
+1. one alarm at a time
+2. alarm()
