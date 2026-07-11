@@ -107,11 +107,20 @@ $ npx create-cloudflare@latest introduction-to-durable-objects
 Durable Objects 사용 시 `await`를 필수로 사용해야 한다.  
 왜냐하면, 코드 상으로 같은 서버에 있는 것처럼 보여도 인스턴스는 어디에 생성될지(다른 곳에 생성되어 있을지) 모르기 때문에 비동기 처리 필요.  
 <br>
-다음과 같은 lifecycle을 따름  
-기본적으로 상태 저장을 위한 db(?)가 있지만 hibernated 상태 후 다시 active되면, 기존 상태가 초기화됨.
+다음과 같은 lifecycle을 따름. hibernated 상태 후 다시 active되면, 기존 상태가 초기화됨.
 
 1. Active, in-memory
 2. Idle(요청 대기 상태), in-memory non-hibernatable
 3. Idle, in-memory hibernateable()
 4. Hibernated(동면)
 5. Inactive
+
+### Durable Object Storage
+
+인스터스 생성 관련 옵션 및 메서드
+
+- `locationHint` 옵션 : instance 생성 시 최대한 그 지역에서 생성될 수 있도록 알려주는 것 (보장 X)
+- `jurisdiction` 메서드 : 데이터가 어디에 저장될 지 관할권을 지정하는 방법 즉, 이 방법을 사용하면 인스턴스가 어디에 생성될지 보장함.
+
+Durable Objects에는 SQLite DB가 내장되어 있음.  
+내장된 SQLite DB는 Hibernated(동면) 과 상관없이 유지된
