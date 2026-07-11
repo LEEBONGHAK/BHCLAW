@@ -19,6 +19,10 @@ export class DurablePotato extends DurableObject<Env> {
 		`);
 	}
 
+	fetch(request: Request): Response | Promise<Response> {
+		return new Response('hello');
+	}
+
 	async increase() {
 		const { total } = this.sql.exec(`UPDATE pongs SET total = total + 1 WHERE id = 1 RETURNING total;`).one() as { total: number };
 		if (total >= 30) {
@@ -28,7 +32,6 @@ export class DurablePotato extends DurableObject<Env> {
 				this.ctx.storage.setAlarm(Date.now() + 10_000);
 			}
 		}
-
 		return `count is ${total}`;
 	}
 
