@@ -14,7 +14,7 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"kv_namespaces": [
 		{
-			"binding": "DB",
+			"binding": "DB_KV",
 			"id": "c729d145a444432db2d23e8d71ba3343",
 			"remote": true,
 		},
