@@ -10,12 +10,15 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-
-let count = 0;
-
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		count = count + 1;
-		return new Response(`Count is ${count}!`);
+		const url = new URL(request.url);
+		console.log(request.cf?.country);
+		if (url.pathname === '/') {
+			const count = Number((await env.DB_KV.get('count')) ?? 0);
+			await env.DB_KV.put('count', `${count + 1}`);
+			return new Response(`Count is ${count + 1}!`);
+		}
+		return new Response(null, { status: 404 });
 	},
 } satisfies ExportedHandler<Env>;

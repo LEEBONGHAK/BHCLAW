@@ -54,5 +54,9 @@ $ npx wrangler@latest kv namspace create [KV_이름]
 ```
 
 `wrangler.jsonc`에 관련 설정 필수 추가 필요  
-binding 옵션 : worker가 service에 접근할 때 사용할 변수 이름  
+binding 옵션 : worker가 service에 접근할 때 사용할 변수 이름
+
+- binding 된 변수를 사용하려면 `npm run cf-typegen` 명령어 실행 typescript 타입 생성
+
 remote 옵션 : cloudflare/local 에뮬레이터 중 선택 (true/false)
+`npx wrangler@latest tail` : 배포된 Cloudflare Workers의 실시간 로그 확인 명령어
