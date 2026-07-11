@@ -124,3 +124,20 @@ Durable Objects 사용 시 `await`를 필수로 사용해야 한다.
 
 Durable Objects에는 SQLite DB가 내장되어 있음.  
 내장된 SQLite DB는 Hibernated(동면) 과 상관없이 유지된
+
+### Concurrency
+
+Durable objects에 내장된 SQLite는 싱글 쓰레드로 작동해서 race condition이 발생하지 않음.  
+내장되어 있어 인스턴스와 함께 실행되기 때문에 비통기 처리(`await`) 할 필요 없음.  
+<br>
+만약, 비동기 처리가 필요할 경우, 아래 구문 사용 필요
+
+```
+this.ctx.blockConcurrencyWhile(async () => {
+	await fetch(".....")
+})
+```
+
+### Data Explorer
+
+Durable Objects의 스토리지가 각 인스턴스마다 따로 있고, 각 durable object들끼리는 서로 격리되어 있음

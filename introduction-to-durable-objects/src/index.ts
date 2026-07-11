@@ -15,9 +15,10 @@ export { DurablePotato } from './do';
 
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
-		const { pathname } = new URL(request.url);
+		const { pathname, searchParams } = new URL(request.url);
+		const nickname = searchParams.get('nickname') ?? 'anon';
 		if (pathname === '/') {
-			const dp = env.DP.getByName('default');
+			const dp = env.DP.getByName(nickname);
 			return new Response(await dp.increase());
 		}
 
