@@ -60,3 +60,36 @@ binding 옵션 : worker가 service에 접근할 때 사용할 변수 이름
 
 remote 옵션 : cloudflare/local 에뮬레이터 중 선택 (true/false)
 `npx wrangler@latest tail` : 배포된 Cloudflare Workers의 실시간 로그 확인 명령어
+
+---
+
+## Durable Objects
+
+### Introduction
+
+**[stateless]**
+
+```
+User ----> Worker (init) ----> Response ----> Worker (killed)
+
+이 경우, 같은 worker를 사용하지 않기 때문에 대화 불가 => 따라서, 같은 데이터 베이스 사용 필요
+
+User Tokyo ----> Worker (init. Japan) ----> Message (KV DB)
+User Jamaica ----> Worker (init. Jamaica) ----> get() messages
+```
+
+**[stateful]**
+
+```
+Server (unique. Germany) (connections)
+|			|			|
+jamaica		japan		argentina
+```
+
+durable objects를 사용하면 stateful하게 사용 가능하며, worker의 장점도 가진다!!
+
+1. 서버에 실경 쓸 필요 없이 코드만 작성하면 cloudflare가 실행해 줌
+2. 스케일 업/다운에 신경 쓸 필요가 없다!
+3. 상태성(stateful)을 보장해준다 -> 채팅 등 실시간 기능 사용 가능
+
+즉, stateful serverless 어플리케이션 생성 가능!
