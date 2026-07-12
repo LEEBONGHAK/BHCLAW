@@ -10,7 +10,7 @@ function App() {
     agent: "ChattingRoomAgent",
     onOpen: () => setIsConnected(true),
     // onStateUpdate: (state) => setPingPongs(state.pingPongCount),
-    onMessage: (event) => console.log(event),
+    onMessage: (event) => console.log(event), // agent에서 보내온 메시지 감지
   });
 
   const sendMessage = () => {

@@ -30,6 +30,18 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
     });
   }
 
+  // 서버가 처음으로 시작될 때 호출되는 내장 메서드
+  onStart(props?: Record<string, unknown> | undefined): void | Promise<void> {
+    void this.sql`
+		CREATE TABLE IF NOT EXISTS messages (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			nickname TEXT NOT NULL,
+			message TEXT NOT NULL,
+			created_at INTEGER NOT NULL
+		)
+	`;
+  }
+
   // state 변경 감지 내장 메서드
   onStateChanged(
     _state: ChattingRoomState | undefined,
@@ -37,6 +49,14 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
   ): void {
     console.log("new state", _state);
     console.log("who did it", _source);
+  }
+
+  // onStateChanged() 메서드와 마찬가지로 state 변경 감지를 하지만 에러를 throw하면 state 변경이 일어나지 않음
+  validateStateChange(
+    _nextState: ChattingRoomState,
+    _source: Connection | "server",
+  ): void {
+    if (_source !== "server") throw new Error("cant do this");
   }
 
   // 연결 감지 내장 메서드
@@ -63,8 +83,20 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
 
   // 메시지 감지 내장 메서드
   onMessage(connection: Connection, message: WSMessage): void | Promise<void> {
-    console.log(message);
-    connection.send("love you back"); // 서버에서 연결된 상대에게 메시지 발송
+    // console.log(message);
+    // connection.send("love you back"); // 서버에서 연결된 상대에게 메시지 발송
+    const messageObj = {
+      nickname: "anon",
+      message: message.toString(),
+      created_at: Date.now(),
+    };
+
+    void this.sql`
+		INSERT INTO messages (nickname, message, created_at) VALUES (${messageObj.nickname}, ${messageObj.message}, ${messageObj.created_at})
+	`;
+
+    // broadcast를 위한 내장 메서드. 연결된 모든 클라이언트에게 보내며, 특정 string 값을 제외하고(빼고) 보낼 수 있음.
+    this.broadcast(JSON.stringify(messageObj), [connection.id]);
   }
 }
 
