@@ -199,3 +199,16 @@ webSocketError(ws: WebSocket, error: unknown): void | Promise<void> {
 > ```bash
 > $ websocat "ws://<hostname or IP>:<port>"
 > ```
+
+---
+
+## Agnet Foundations
+
+### Introductions
+
+프로젝트 세팅
+
+```bash
+$ npx create-cloudflare@latest agent-foundations --template nomadcoders/nomadclaw/templates/agent-foundations
+$ npm i agents	# durabel objects 위에 만들어진 agent class를 연결할 수 있게 해주는 패키지
+```
