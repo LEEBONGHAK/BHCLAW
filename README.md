@@ -164,4 +164,38 @@ fetch(request: Request): Response | Promise<Response> {
 }
 ```
 
-Worker in doorman ---> Worker forwards the request to Durable Objects ---> Replies
+Worker in doorman ---> Worker forwards the request to Durable Objects ---> Replies  
+ws ---> cloudflare (---> Durable Object) ---> ws
+
+<br>
+웹소켓 메시지가 올 때 알림을 받을 수 있는 메서드(durable objects 내장 메서드). 메시지가 오면 해당 함수가 실행됨.
+
+```typescript
+webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void> {
+	console.log(message);
+}
+```
+
+웹소켓을 누가 끊었는지 알 수 있는 메서드.(durable objects 내장 메서드)
+
+```typescript
+webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void> {
+	console.log('someone left');
+}
+```
+
+웹소켓 에러를 알 수 있는 메서드.(durable objects 내장 메서드)
+
+```typescript
+webSocketError(ws: WebSocket, error: unknown): void | Promise<void> {
+
+}
+```
+
+> #### WebSocket CLI Tool
+>
+> websocat : 터미널에서 websocket에 연결할 때 사용하는 cli 툴
+>
+> ```bash
+> $ websocat "ws://<hostname or IP>:<port>"
+> ```

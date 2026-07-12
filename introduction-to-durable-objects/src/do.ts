@@ -20,7 +20,24 @@ export class DurablePotato extends DurableObject<Env> {
 	}
 
 	fetch(request: Request): Response | Promise<Response> {
-		return new Response('hello');
+		const url = new URL(request.url);
+		const nickname = url.searchParams.get('nickname') ?? 'anon';
+		const webSocketPair = new WebSocketPair(); // 양방향 연결 제공(client-server). 전화처럼
+
+		const [client, server] = Object.values(webSocketPair);
+		this.ctx.acceptWebSocket(server); // context에 websocket 적용, websocket server의 데이터를 durable objects에 저장
+
+		return new Response(null, { status: 101, webSocket: client }); // 101: 웹 소켄 정상 연결, client를 전달해줌
+	}
+
+	// 웹소켓 메시지가 올 때 알림을 받을 수 있는 메서드(durable objects 내장 메서드). 메시지가 오면 해당 함수가 실행됨.
+	webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void> {
+		console.log(message);
+	}
+
+	// 웹소켓을 누가 끊었는지 알 수 있는 메서드.(durable objects 내장 메서드)
+	webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void> {
+		console.log('someone left');
 	}
 
 	async increase() {
