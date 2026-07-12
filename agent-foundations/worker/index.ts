@@ -1,6 +1,7 @@
 import {
   Agent,
   callable,
+  getCurrentAgent,
   routeAgentRequest,
   type Connection,
   type ConnectionContext,
@@ -64,6 +65,13 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
     connection: Connection,
     ctx: ConnectionContext,
   ): void | Promise<void> {
+    const url = new URL(ctx.request.url);
+    const nickname = url.searchParams.get("nickname") ?? "anon";
+
+    connection.setState({
+      nickname,
+    });
+
     this.setState({
       currentlyOnline: this.state.currentlyOnline + 1,
     });
@@ -82,11 +90,14 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
   }
 
   // 메시지 감지 내장 메서드
-  onMessage(connection: Connection, message: WSMessage): void | Promise<void> {
+  onMessage(
+    connection: Connection<{ nickname: string }>,
+    message: WSMessage,
+  ): void | Promise<void> {
     // console.log(message);
     // connection.send("love you back"); // 서버에서 연결된 상대에게 메시지 발송
     const messageObj = {
-      nickname: "anon",
+      nickname: connection.state?.nickname,
       message: message.toString(),
       created_at: Date.now(),
     };
@@ -96,7 +107,15 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
 	`;
 
     // broadcast를 위한 내장 메서드. 연결된 모든 클라이언트에게 보내며, 특정 string 값을 제외하고(빼고) 보낼 수 있음.
-    this.broadcast(JSON.stringify(messageObj), [connection.id]);
+    // this.broadcast(JSON.stringify(messageObj), [connection.id]);
+    this.broadcast(JSON.stringify(messageObj));
+  }
+
+  @callable()
+  loadHistory() {
+    const { connection } = getCurrentAgent<ChattingRoomAgent>(); // getCurrentAgent : 현재 들어와 있는 agent에 접근할 수 있게 해줌
+    console.log(connection?.state, "loaded history");
+    return this.sql`SELECT * FROM messages ORDER BY created_at ASC LIMIT 100`;
   }
 }
 
