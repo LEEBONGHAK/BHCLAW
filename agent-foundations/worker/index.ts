@@ -43,21 +43,31 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
 	`;
   }
 
-  // state 변경 감지 내장 메서드
-  onStateChanged(
-    _state: ChattingRoomState | undefined,
-    _source: Connection | "server",
-  ): void {
-    console.log("new state", _state);
-    console.log("who did it", _source);
-  }
+  //   // state 변경 감지 내장 메서드
+  //   onStateChanged(
+  //     _state: ChattingRoomState | undefined,
+  //     _source: Connection | "server",
+  //   ): void {
+  //     console.log("new state", _state);
+  //     console.log("who did it", _source);
+  //   }
 
-  // onStateChanged() 메서드와 마찬가지로 state 변경 감지를 하지만 에러를 throw하면 state 변경이 일어나지 않음
-  validateStateChange(
-    _nextState: ChattingRoomState,
-    _source: Connection | "server",
-  ): void {
-    if (_source !== "server") throw new Error("cant do this");
+  //   // onStateChanged() 메서드와 마찬가지로 state 변경 감지를 하지만 에러를 throw하면 state 변경이 일어나지 않음
+  //   validateStateChange(
+  //     _nextState: ChattingRoomState,
+  //     _source: Connection | "server",
+  //   ): void {
+  //     if (_source !== "server") throw new Error("cant do this");
+  //   }
+
+  // 특정 조건이 들어갈 경우, Readonly로 설정할 수 있는 내장 메서드
+  shouldConnectionBeReadonly(
+    _connection: Connection,
+    _ctx: ConnectionContext,
+  ): boolean {
+    const url = new URL(_ctx.request.url);
+    const nickname = url.searchParams.get("nickname") ?? "anon";
+    return nickname.includes("read");
   }
 
   // 연결 감지 내장 메서드
@@ -114,6 +124,7 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
   @callable()
   loadHistory() {
     const { connection } = getCurrentAgent<ChattingRoomAgent>(); // getCurrentAgent : 현재 들어와 있는 agent에 접근할 수 있게 해줌
+    // this.setConnectionReadonly(connection, true);	// Read Only Connections 설정 (true: readonly) / readonly connection은 state를 수정 못함. state 수정과 관련된 callable 메서드를 포함해서
     console.log(connection?.state, "loaded history");
     return this.sql`SELECT * FROM messages ORDER BY created_at ASC LIMIT 100`;
   }

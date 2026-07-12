@@ -20,7 +20,7 @@ function App() {
   const agent = useAgent<ChattingRoomAgent, ChattingRoomState>({
     agent: "ChattingRoomAgent",
     query: {
-      name: nickname,
+      nickname: nickname,
     },
     enabled: ready,
     onOpen: async () => {
@@ -31,6 +31,7 @@ function App() {
     // onStateUpdate: (state) => setPingPongs(state.pingPongCount),
     onMessage: (event) =>
       setMessages((prev) => [...prev, JSON.parse(event.data)]), // agent에서 보내온 메시지 감지
+    onStateUpdateError: () => console.log("cant do that."),
   });
 
   const sendMessage = () => {
