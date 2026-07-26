@@ -7,6 +7,22 @@ function App() {
   const agent = useAgent({ agent: "PotatoChatAgent" });
   const { messages, sendMessage, clearHistory, status } = useAgentChat({
     agent,
+    // model이 execute가 없는 툴을 실행할 때 호출되는 function callback
+    onToolCall: async ({ toolCall, addToolOutput }) => {
+      // console.log(toolCall);
+      // 호출한 툴 확인
+      if (toolCall.toolName === "get_location") {
+        const position = await new Promise<GeolocationPosition>(
+          (resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject),
+        );
+        // 결과값을 모델에게 넘겨줌)
+        addToolOutput({
+          toolCallId: toolCall.toolCallId,
+          output: position.toJSON(),
+        });
+      }
+    },
   });
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {

@@ -3,7 +3,7 @@ import { tool } from "ai";
 import z from "zod";
 
 export const getWeather = tool({
-  title: "GetWeather",
+  title: "gettWeather",
   description: "Get the wearther of a city",
   inputSchema: z.object({
     // zod는 AI model이 어떤 종류의 데이터를 가지고 툴을 호출할지 지정할 수 있게 해줌.
@@ -16,4 +16,10 @@ export const getWeather = tool({
   execute: ({ city }) => {
     return `The weather in the ${city} is sunny.`;
   },
+});
+
+export const getLocation = tool({
+  title: "getLocation",
+  description: "Use this to get the user location",
+  inputSchema: z.object({}),
 });
