@@ -37,15 +37,12 @@ export class EmailAgent extends AIChatAgent<Env> {
             email: z.string().meta({ description: "The email of the user" }),
           }),
           execute: async ({ email }) => {
-            await this.sendEmail({
-              binding: this.env.EMAIL,
-              to: email,
-              from: "youragent@agent.com",
-              subject: "Transcript",
-              text: JSON.stringify(this.messages),
+            // 내장된 큐를 이용해 비싸거나 느린 작업을 덜어넣을 수 있음
+            const taskId = await this.queue("sendSlowEmail", {
+              email,
+              messages: JSON.stringify(this.messages),
             });
-
-            return { success: true, sendTo: email };
+            return { success: true, taskId };
           },
         }),
       },
@@ -54,6 +51,25 @@ export class EmailAgent extends AIChatAgent<Env> {
     });
 
     return result.toUIMessageStreamResponse();
+  }
+
+  async sendSlowEmail({
+    email,
+    messages,
+  }: {
+    email: string;
+    messages: string;
+  }) {
+    await new Promise((resolve) => setTimeout(resolve, 30000));
+    await this.sendEmail({
+      binding: this.env.EMAIL,
+      to: email,
+      from: "youragent@agent.com",
+      subject: "Transcript",
+      text: JSON.stringify(messages),
+    });
+
+    console.log("slow email processed");
   }
 
   async onEmail(email: AgentEmail) {
