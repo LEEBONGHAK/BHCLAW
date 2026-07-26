@@ -212,3 +212,23 @@ webSocketError(ws: WebSocket, error: unknown): void | Promise<void> {
 $ npx create-cloudflare@latest agent-foundations --template nomadcoders/nomadclaw/templates/agent-foundations
 $ npm i agents	# durabel objects 위에 만들어진 agent class를 연결할 수 있게 해주는 패키지
 ```
+
+`@callable()` : 프런트엔드에서 호출할 수 있게 만들어주는 태그(?)
+
+---
+
+## Chat Agent
+
+### Intrductions
+
+프로젝트 세팅
+
+```bash
+$ npx create-cloudflare@latest ai-chat-agent-foundations --template nomadcoders/nomadclaw/templates/ai-chat-agent-foundations
+$ npm i agents @cloudflare/ai-chat ai zod workers-ai-provider
+```
+
+- `@cloudflare/ai-chat` : cloudflare 에서 제공하는 ai chatting 관련 SDK
+- `ai` : ai 모델과 소통하고 javascript로 ai 기능을 사용하는데 도움을 주는 SDK
+- `zod` : agent한테 tool을 줄 때, 그 tool의 validation을 위해 사용됨.
+- `workers-ai-provider` :

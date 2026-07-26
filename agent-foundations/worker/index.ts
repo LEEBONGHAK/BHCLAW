@@ -113,6 +113,7 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
     };
 
     if (message.toString().includes("delete")) {
+      //   this.scheduleEvery(30, "deleteMessages"); // cron 같은 기능
       this.schedule(30, "deleteMessages");
       const allSchedules = this.listSchedules(); // 등록된 모든 스케쥴 리스트 확인
       console.log(allSchedules);
@@ -124,6 +125,7 @@ export class ChattingRoomAgent extends Agent<Env, ChattingRoomState> {
 
     // broadcast를 위한 내장 메서드. 연결된 모든 클라이언트에게 보내며, 특정 string 값을 제외하고(빼고) 보낼 수 있음.
     // this.broadcast(JSON.stringify(messageObj), [connection.id]);
+    // Web Socket에는 직렬화 가능한 메시지만 전송 가능함.
     this.broadcast(JSON.stringify(messageObj));
   }
 
