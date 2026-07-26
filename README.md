@@ -259,3 +259,41 @@ $ npm i agents @cloudflare/ai-chat ai zod workers-ai-provider
 $ npx create-cloudflare@latest email-agents --template nomadcoders/nomadclaw/templates/email-agents
 $ npm i agents @cloudflare/ai-chat ai zod workers-ai-provider
 ```
+
+### Receiving Email
+
+실제로 agent에 email을 보내고 싶다면 agent를 배포해야하며, 도메인도 사야함 (아래 자료 참고)
+
+- https://developers.cloudflare.com/email-service/get-started/send-emails/
+- https://developers.cloudflare.com/email-service/get-started/route-emails/
+
+Same domain, you need to set it up twice, once for email sending and once for email routing.
+
+```text
+http://localhost:<port>/cdn-cgi/handler/email
+```
+
+위 URL을 이용해 도메인 없이 이메일 기능을 시뮬레이션 할 수 있음.  
+아래는 이메일을 받기위한 테스트 예시이다.
+
+- 관련 자료 : https://developers.cloudflare.com/email-service/local-development/routing/
+
+```bash
+# 시뮬레이션 예시
+$ curl --request POST 'http://localhost:5173/cdn-cgi/handler/email' \
+  --url-query 'from=sender@example.com' \
+  --url-query 'to=recipient@example.com' \
+  --data-raw 'Received: from smtp.example.com (127.0.0.1)
+        by cloudflare-email.com (unknown) id 4fwwffRXOpyR
+        for <recipient@example.com>; Tue, 27 Aug 2024 15:50:20 +0000
+From: "John" <sender@example.com>
+Reply-To: sender@example.com
+To: recipient@example.com
+Subject: Testing Email Workers Local Dev
+Content-Type: text/html; charset="windows-1252"
+X-Mailer: Curl
+Date: Tue, 27 Aug 2024 08:49:44 -0700
+Message-ID: <6114391943504294873000@ZSH-GHOSTTY>
+
+Hi there'
+```
