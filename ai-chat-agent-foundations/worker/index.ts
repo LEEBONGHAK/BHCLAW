@@ -9,7 +9,7 @@ import {
   type ToolSet,
 } from "ai";
 import { createWorkersAI } from "workers-ai-provider";
-import { getLocation, getWeather } from "./tools";
+import { buyPlaneTicket, getLocation, getTickets, getWeather } from "./tools";
 
 export class PotatoChatAgent extends AIChatAgent<Env> {
   async onChatMessage(
@@ -39,7 +39,10 @@ export class PotatoChatAgent extends AIChatAgent<Env> {
       tools: {
         get_weather: getWeather,
         get_location: getLocation,
+        get_tickets: getTickets,
+        buy_plan_ticket: buyPlaneTicket,
       },
+      abortSignal: _options?.abortSignal,
       // 과도한 루프로 과도한 과금 방지를 위해 종료 조건(단계) 설정
       // 모델이 툴을 사용할 때 1단계 소모, 결과를 받아 응답할 때 1단계 소모
       // isLoopFinished() : 모델이 필요할 때까지 진행하는 옵션 -> 과도한 루프로 과금 주의!!
