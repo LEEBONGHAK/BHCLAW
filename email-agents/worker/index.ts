@@ -1,5 +1,5 @@
 import { AIChatAgent, type OnChatMessageOptions } from "@cloudflare/ai-chat";
-import { routeAgentEmail, routeAgentRequest } from "agents";
+import { getAgentByName, routeAgentEmail, routeAgentRequest } from "agents";
 import { createAddressBasedEmailResolver, type AgentEmail } from "agents/email";
 import {
   convertToModelMessages,
@@ -11,7 +11,7 @@ import {
 } from "ai";
 // import PostalMime from "postal-mime";
 import { createWorkersAI } from "workers-ai-provider";
-import z, { success } from "zod";
+import z from "zod";
 
 export class EmailAgent extends AIChatAgent<Env> {
   // onStart(props?: Record<string, unknown> | undefined): void | Promise<void> {
@@ -61,13 +61,24 @@ export class EmailAgent extends AIChatAgent<Env> {
     messages: string;
   }) {
     await new Promise((resolve) => setTimeout(resolve, 30000));
-    await this.sendEmail({
-      binding: this.env.EMAIL,
-      to: email,
-      from: "youragent@agent.com",
-      subject: "Transcript",
-      text: JSON.stringify(messages),
-    });
+    try {
+      await this.retry(
+        async (attempt) => {
+          await this.sendEmail({
+            binding: this.env.EMAIL,
+            to: email,
+            from: "youragent@agent.com",
+            subject: "Transcript",
+            text: JSON.stringify(messages),
+          });
+        },
+        {
+          maxAttempts: 10,
+        },
+      );
+    } catch {
+      console.log("10 attempts failed");
+    }
 
     console.log("slow email processed");
   }
@@ -88,12 +99,57 @@ export class EmailAgent extends AIChatAgent<Env> {
       body: `Thank you for your email`,
     });
   }
+
+  async onRequest(request: Request): Response | Promise<Response> {
+    // 웹훅 알림을 받았는데 이미 실행 중인 작업이 있다면 60초 대기 -> 이후 로직 진행
+    const stable = await this.waitUntilStable({ timeout: 60_000 });
+
+    if (!stable) return new Response("failed");
+
+    // 웹 훅으로 보내고 끝 -> 대화만 추가
+    await this.persistMessages([
+      ...this.messages,
+      {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        parts: [
+          {
+            type: "text",
+            text: "Hello i've been hit from a webhook!",
+          },
+        ],
+      },
+    ]);
+
+    // 웹 훅으로 대화 추가 후 모델이 추가된 대화에 대해 답변을 바로 진행함.
+    // await this.saveMessages((messages) => [
+    //   ...messages,
+    //   {
+    //     id: crypto.randomUUID(),
+    //     role: "assistant",
+    //     parts: [
+    //       {
+    //         type: "text",
+    //         text: "Hello i've been hit from a webhook!",
+    //       },
+    //     ],
+    //   },
+    // ]);
+
+    return new Response("ok");
+  }
 }
 
 export default {
   // http request를 받을 때 호출됨.
-  fetch(request, env) {
+  async fetch(request, env) {
     console.log(request.url);
+    const url = new URL(request.url);
+    if (url.pathname === "/webhook") {
+      const agentId = url.searchParams.get("agentId") ?? "default";
+      const agent = await getAgentByName(env.EmailAgent, agentId);
+      return agent.fetch(request);
+    }
     return (
       routeAgentRequest(request, env) ?? new Response(null, { status: 404 })
     );
