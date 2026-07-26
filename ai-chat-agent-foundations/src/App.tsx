@@ -23,6 +23,8 @@ function App() {
             {message.parts.map((part, index) =>
               part.type === "text" ? (
                 <span key={index}>{part.text}</span>
+              ) : part.type === "reasoning" ? (
+                <em key={index}>{part.text}</em>
               ) : null,
             )}
           </li>

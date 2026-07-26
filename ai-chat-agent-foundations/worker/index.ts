@@ -3,6 +3,7 @@ import { routeAgentRequest } from "agents";
 import {
   convertToModelMessages,
   generateText,
+  streamText,
   type GenerateTextOnFinishCallback,
   type ToolSet,
 } from "ai";
@@ -22,12 +23,19 @@ export class PotatoChatAgent extends AIChatAgent<Env> {
     const convertedMessages = await convertToModelMessages(this.messages);
     // console.log(JSON.stringify(convertedMessages));
 
-    const { text } = await generateText({
+    // const { text } = await generateText({
+    //   model: workersAi("@cf/zai-org/glm-4.7-flash"),
+    //   messages: convertedMessages,
+    // });
+
+    // return new Response(text);
+
+    const result = await streamText({
       model: workersAi("@cf/zai-org/glm-4.7-flash"),
       messages: convertedMessages,
     });
 
-    return new Response(text);
+    return result.toUIMessageStreamResponse();
   }
 }
 
