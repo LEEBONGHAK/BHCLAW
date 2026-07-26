@@ -3,11 +3,13 @@ import { routeAgentRequest } from "agents";
 import {
   convertToModelMessages,
   generateText,
+  stepCountIs,
   streamText,
   type GenerateTextOnFinishCallback,
   type ToolSet,
 } from "ai";
 import { createWorkersAI } from "workers-ai-provider";
+import { getWeather } from "./tools";
 
 export class PotatoChatAgent extends AIChatAgent<Env> {
   async onChatMessage(
@@ -30,9 +32,17 @@ export class PotatoChatAgent extends AIChatAgent<Env> {
 
     // return new Response(text);
 
+    // 사용 AI 처럼 결과를 한글자 한글자 보여주는(streaming) 방식으로 만들기
     const result = await streamText({
       model: workersAi("@cf/zai-org/glm-4.7-flash"),
       messages: convertedMessages,
+      tools: {
+        get_weather: getWeather,
+      },
+      // 과도한 루프로 과도한 과금 방지를 위해 종료 조건(단계) 설정
+      // 모델이 툴을 사용할 때 1단계 소모, 결과를 받아 응답할 때 1단계 소모
+      // isLoopFinished() : 모델이 필요할 때까지 진행하는 옵션 -> 과도한 루프로 과금 주의!!
+      stopWhen: stepCountIs(50),
     });
 
     return result.toUIMessageStreamResponse();
