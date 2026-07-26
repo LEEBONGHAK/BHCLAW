@@ -4,7 +4,7 @@ import type React from "react";
 
 function App() {
   const agent = useAgent({ agent: "PotatoChatAgent" });
-  const { messages, sendMessage } = useAgentChat({ agent });
+  const { messages, sendMessage, clearHistory } = useAgentChat({ agent });
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,6 +32,7 @@ function App() {
         <input name="input" placeholder="Type a message..." />
         <button type="submit">Send</button>
       </form>
+      <button onClick={clearHistory}>clear convo</button>
     </div>
   );
 }

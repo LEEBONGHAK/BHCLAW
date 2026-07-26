@@ -235,7 +235,7 @@ $ npm i agents @cloudflare/ai-chat ai zod workers-ai-provider
 
 ### AIChateAgent
 
-`wrangler.jsonc` 에 기재한 아래의 binding을 추가하면 cloudflare를 통해 다양한 ai model들을 사용 가능함.  
+`wrangler.jsonc` 에 기재한 아래의 binding을 추가하면 cloudflare를 통해 호스팅된 다양한 ai model들을 사용 가능함.  
 그러나, 이것 때문에 오프라인으로 작업이 불가하고, AI model을 사용할 때마다 비용이 부담됨.
 무료 요금제에도 무료로 사용 가능하지만 사용 한도가 낮음.
 
