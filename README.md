@@ -297,3 +297,11 @@ Message-ID: <6114391943504294873000@ZSH-GHOSTTY>
 
 Hi there'
 ```
+
+### Routing Email
+
+postal mime : 이메일 파싱 패키지
+
+```bash
+$ npm i postal-mime
+```

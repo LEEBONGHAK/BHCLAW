@@ -3,7 +3,9 @@ import { useAgent } from "agents/react";
 import { getToolName, isToolUIPart, type UIMessage } from "ai";
 
 function App() {
-  const agent = useAgent({ agent: "EmailAgent" });
+  // 격리된 에이전트를 사용자에게 부여하기 위해서는 에이전트에 이름을 부여해야 함.
+  // 그렇지 않으면 모두가 같은 에이전트(대회 히스토리, 데이터 등이 공유됨)를 받게 됨.
+  const agent = useAgent({ agent: "EmailAgent", name: "room:1" });
 
   const {
     messages,
