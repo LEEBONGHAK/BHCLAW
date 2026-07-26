@@ -1,0 +1,14 @@
+References: <msg-001@example.com>
+Date: Sun, 26 Jul 2026 10:53:06 +0000
+From: =?utf-8?B?RW1haWxBZ2VudA==?= <recipient@example.com>
+To: <sender@example.com>
+Message-ID: <recipient@example.com>
+Subject: =?utf-8?B?SW0gYW5zd2VyaW5nIHlvdQ==?=
+MIME-Version: 1.0
+In-Reply-To: <msg-001@example.com>
+X-Agent-Name: email-agent
+X-Agent-ID: recipient
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+Thank you for your email

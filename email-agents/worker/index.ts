@@ -1,7 +1,17 @@
-import { AIChatAgent } from "@cloudflare/ai-chat";
+import { AIChatAgent, type OnChatMessageOptions } from "@cloudflare/ai-chat";
 import { routeAgentEmail, routeAgentRequest } from "agents";
 import { createAddressBasedEmailResolver, type AgentEmail } from "agents/email";
-import PostalMime from "postal-mime";
+import {
+  convertToModelMessages,
+  stepCountIs,
+  streamText,
+  tool,
+  type GenerateTextOnFinishCallback,
+  type ToolSet,
+} from "ai";
+// import PostalMime from "postal-mime";
+import { createWorkersAI } from "workers-ai-provider";
+import z, { success } from "zod";
 
 export class EmailAgent extends AIChatAgent<Env> {
   // onStart(props?: Record<string, unknown> | undefined): void | Promise<void> {
@@ -9,14 +19,58 @@ export class EmailAgent extends AIChatAgent<Env> {
   //   this.env.EMAIL.send({});
   // }
 
+  async onChatMessage(
+    _onFinish: GenerateTextOnFinishCallback<ToolSet>,
+    _options?: OnChatMessageOptions,
+  ): Promise<Response | undefined> {
+    const workerAi = createWorkersAI({
+      binding: this.env.AI,
+    });
+
+    const result = streamText({
+      model: workerAi("@cf/zai-org/glm-4.7-flash"),
+      messages: await convertToModelMessages(this.messages),
+      tools: {
+        sendTranscript: tool({
+          description: "Send the transcript of the conversation to the user",
+          inputSchema: z.object({
+            email: z.string().meta({ description: "The email of the user" }),
+          }),
+          execute: async ({ email }) => {
+            await this.sendEmail({
+              binding: this.env.EMAIL,
+              to: email,
+              from: "youragent@agent.com",
+              subject: "Transcript",
+              text: JSON.stringify(this.messages),
+            });
+
+            return { success: true, sendTo: email };
+          },
+        }),
+      },
+      abortSignal: _options?.abortSignal,
+      stopWhen: stepCountIs(50),
+    });
+
+    return result.toUIMessageStreamResponse();
+  }
+
   async onEmail(email: AgentEmail) {
-    const raw = await email.getRaw();
+    // const raw = await email.getRaw();
     // console.log(raw);
     // console.log();
-    const parsed = await PostalMime.parse(raw);
+    // const parsed = await PostalMime.parse(raw);
     // console.log(parsed);
     // console.log();
-    console.log(parsed.to, parsed.from, parsed.text);
+    // console.log(parsed.to, parsed.from, parsed.text);
+
+    await this.replyToEmail(email, {
+      fromName: "EmailAgent",
+      subject: "Im answering you",
+      contentType: "text/plain",
+      body: `Thank you for your email`,
+    });
   }
 }
 
