@@ -53,7 +53,7 @@ export class PotatoChatAgent extends AIChatAgent<Env> {
     return result.toUIMessageStreamResponse();
   }
 
-  // 내용을 바꾸거나 검열하고 싶을 때 사용 가능, 메시지가 저장될 때마다 호출되고 메시지를 수정할 수	있게 되며 꼭 return 해야함.
+  // 내용을 바꾸거나 검열하고 싶을 때 사용 가능, 메시지가 저장되기 전에 호출되고 메시지를 수정할 수	있게 되며 꼭 return 해야함.
   // 프롬프트 내 내용이 검열되는 것 뿐이지 대답은 정상적으로 진행됨.
   protected sanitizeMessageForPersistence(message: UIMessage): UIMessage {
     return {

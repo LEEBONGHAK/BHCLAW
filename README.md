@@ -231,7 +231,7 @@ $ npm i agents @cloudflare/ai-chat ai zod workers-ai-provider
 - `@cloudflare/ai-chat` : cloudflare 에서 제공하는 ai chatting 관련 SDK
 - `ai` : ai 모델과 소통하고 javascript로 ai 기능을 사용하는데 도움을 주는 SDK
 - `zod` : agent한테 tool을 줄 때, 그 tool의 validation을 위해 사용됨.
-- `workers-ai-provider` :
+- `workers-ai-provider` : 호스팅 또는 바인딩된 AI model을 사용할 수 있게 제공하는 provider
 
 ### AIChateAgent
 
@@ -246,3 +246,16 @@ $ npm i agents @cloudflare/ai-chat ai zod workers-ai-provider
 ```
 
 - 사용 가능한 AI 모델 목록 : https://developers.cloudflare.com/ai/models/
+
+---
+
+## Email Agents
+
+### Introductions
+
+프로젝트 세팅
+
+```bash
+$ npx create-cloudflare@latest email-agents --template nomadcoders/nomadclaw/templates/email-agents
+$ npm i agents @cloudflare/ai-chat ai zod workers-ai-provider
+```
