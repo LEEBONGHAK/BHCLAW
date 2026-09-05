@@ -13,10 +13,20 @@ import z from "zod";
 const VoiceAgentBase = withVoice(Agent);
 
 export class VoiceAgent extends VoiceAgentBase<Env> {
-  transcriber = new WorkersAIFluxSTT(this.env.AI); // STT -> speech to text
+  transcriber = new WorkersAIFluxSTT(this.env.AI, {
+    keyterms: [
+      "tailwind",
+      "adam smith",
+      "cloudflare",
+      "google",
+      "weather",
+      "seoul",
+      "busan",
+    ], // transcriber가 올바른 방향으로 갈 수 있도록 알아야할 용어들울 줄 수 있음
+  }); // STT -> speech to text
   tts = new WorkersAITTS(this.env.AI); // TTS -> text to speech
 
-  // TTS 전 실행되는 메서드 -> 음성으로 변환하기 전에 이 메서드를 이용해 내용 수정이 가능함.
+  // TTS 전 실행되는 메서드 -> 음성으로 변환하기 전에 이 메서드를 이용해 내용 수정이 가능함. (음성으로 대답에 한하여)
   beforeSynthesize(text: string, connection: Connection) {
     console.log("beforeSynthesize");
     return text.replaceAll("*", ""); // * 제거

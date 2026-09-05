@@ -305,3 +305,21 @@ postal mime : 이메일 파싱 패키지
 ```bash
 $ npm i postal-mime
 ```
+
+---
+
+## Voice Agents
+
+### Introductions
+
+프로젝트 세팅
+
+```bash
+$ npx create-cloudflare@latest voice-agents --template nomadcoders/nomadclaw/templates/voice-agents
+$ npm run cf-typegen
+```
+
+### VoiceAgent
+
+`WorkersAIFluxSTT` : 음성을 input으로 받아 text 변환 (STT)
+`WokersAITTS` : text to speach
