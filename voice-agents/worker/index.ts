@@ -1,4 +1,4 @@
-import { Agent, routeAgentRequest } from "agents";
+import { Agent, callable, routeAgentRequest, type Connection } from "agents";
 import {
   withVoice,
   WorkersAIFluxSTT,
@@ -13,8 +13,14 @@ import z from "zod";
 const VoiceAgentBase = withVoice(Agent);
 
 export class VoiceAgent extends VoiceAgentBase<Env> {
-  transcriber = new WorkersAIFluxSTT(this.env.AI); // STT
-  tts = new WorkersAITTS(this.env.AI); // TTS
+  transcriber = new WorkersAIFluxSTT(this.env.AI); // STT -> speech to text
+  tts = new WorkersAITTS(this.env.AI); // TTS -> text to speech
+
+  // TTS 전 실행되는 메서드 -> 음성으로 변환하기 전에 이 메서드를 이용해 내용 수정이 가능함.
+  beforeSynthesize(text: string, connection: Connection) {
+    console.log("beforeSynthesize");
+    return text.replaceAll("*", ""); // * 제거
+  }
 
   // STT 후 실행되는 메서드
   async onTurn(transcript: string, context: VoiceTurnContext) {
@@ -38,12 +44,20 @@ export class VoiceAgent extends VoiceAgentBase<Env> {
           inputSchema: z.object({
             city: z.string(),
           }),
-          execute: ({ city }) => `The weather in city is ${city}`,
+          execute: ({ city }) => {
+            console.log(city);
+            return `The weather in ${city} is sunny and 25°C.`;
+          },
         }),
       },
     });
 
     return result.textStream;
+  }
+
+  @callable()
+  getHistory() {
+    return this.getConversationHistory(50);
   }
 }
 

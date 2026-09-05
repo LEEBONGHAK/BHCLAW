@@ -1,8 +1,21 @@
-import { useVoiceAgent } from "@cloudflare/voice/react";
+import { useVoiceAgent, type VoiceRole } from "@cloudflare/voice/react";
 import { useAgent } from "agents/react";
+import { useState } from "react";
 
 function App() {
-  const agent = useAgent({ agent: "VoiceAgent" });
+  const [history, setHistory] = useState<
+    {
+      role: VoiceRole;
+      content: string;
+    }[]
+  >([]);
+  const agent = useAgent({
+    agent: "VoiceAgent",
+    onOpen: async () => {
+      const history = await agent.stub.getHistory();
+      setHistory(history);
+    },
+  });
   const {
     startCall,
     endCall,
@@ -22,9 +35,14 @@ function App() {
       <hr />
       transcript :
       <ul>
+        {history.map((message, idx) => (
+          <li key={idx}>
+            <strong>{message.role}</strong> : {message.content}
+          </li>
+        ))}
         {transcript.map((message) => (
           <li key={message.timestamp}>
-            {message.role} : {message.text}
+            <strong>{message.role}</strong> : {message.text}
           </li>
         ))}
       </ul>
