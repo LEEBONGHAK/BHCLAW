@@ -45,6 +45,13 @@
       "binding": "LOADER",
     },
   ],
+  "r2_buckets": [
+    {
+      "bucket_name": "browser-agents-bucket",
+      "binding": "FILES",
+      "remote": true,
+    },
+  ],
   /**
    * Smart Placement
    * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

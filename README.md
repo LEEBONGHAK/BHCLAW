@@ -340,3 +340,11 @@ $ npm i @cloudflare/codemode
 `Dynamic worker` : 어떤 코드로든 runtime에 가동할 수 있는 worker (일종의 sandbox)  
 <br>
 동작 원리: Agent ---> Connection to Browser ---> e.g. 'please go to website and click on the reviews button' ---> { write code } ---> (dynamic worker { eval(code) } + CDP object) ---> results ---> Agent
+
+### File Uploads
+
+R2 저장소 사용하기 -> 매우 쌈!
+
+```bash
+$ npx wrangler@latest r2 bucket create <bucket-name>
+```
