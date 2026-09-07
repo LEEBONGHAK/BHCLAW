@@ -100,6 +100,19 @@ export class BrowserAgent extends AIChatAgent<Env> {
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname.startsWith("/screenshots/")) {
+      const key = url.pathname.slice(1);
+      const file = await env.FILES.get(key);
+      if (file) {
+        return new Response(file.body, {
+          headers: {
+            "Content-Type":
+              file.httpMetadata?.contentType || "application/octet-stream",
+          },
+        });
+      }
+    }
     return (
       (await routeAgentRequest(request, env)) ??
       new Response(null, { status: 404 })
