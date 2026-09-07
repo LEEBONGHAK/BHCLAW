@@ -323,3 +323,20 @@ $ npm run cf-typegen
 
 `WorkersAIFluxSTT` : 음성을 input으로 받아 text 변환 (STT)
 `WokersAITTS` : text to speach
+
+---
+
+## Browser Agents
+
+### Introductions
+
+```bash
+$ npx create-cloudflare@latest browser-agents --template nomadcoders/nomadclaw/templates/browser-agents
+$ npm i @cloudflare/codemode
+```
+
+### Dynamic Workers
+
+`Dynamic worker` : 어떤 코드로든 runtime에 가동할 수 있는 worker (일종의 sandbox)  
+<br>
+동작 원리: Agent ---> Connection to Browser ---> e.g. 'please go to website and click on the reviews button' ---> { write code } ---> (dynamic worker { eval(code) } + CDP object) ---> results ---> Agent
