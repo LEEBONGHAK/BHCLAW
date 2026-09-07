@@ -8,7 +8,15 @@ import z from "zod";
 
 export { CodemodeRuntime } from "@cloudflare/codemode";
 
-export class BrowserAgent extends AIChatAgent<Env> {
+export type BrowserAgentState = {
+  liveUrl?: string | unknown;
+};
+
+export class BrowserAgent extends AIChatAgent<Env, BrowserAgentState> {
+  initialState = {
+    liveUrl: null,
+  };
+
   browser?: Browser;
   page?: Page;
 
@@ -16,11 +24,50 @@ export class BrowserAgent extends AIChatAgent<Env> {
     if (this.page && this.browser && this.browser.connected) {
       return this.page;
     }
-    this.browser = await puppeteer.launch(this.env.BROWSER);
+    this.browser = await puppeteer.launch(this.env.BROWSER, {
+      recording: true, // 브라우저 세션을 기록하도록 설정
+    });
     this.page = await this.browser.newPage();
     await this.page.setViewport({ width: 1280, height: 800 });
 
+    const liveViewUrl = await this.getLiveViewUrl();
+
     return this.page;
+  }
+
+  async getLiveViewUrl() {
+    if (!this.browser) return;
+
+    const sessionId = this.browser.sessionId();
+
+    const res = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${this.env.ACCOUNT_ID}/browser-rendering/devtools/browser/${sessionId}/json/list`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.env.API_TOKEN}`,
+        },
+      },
+    );
+
+    const data = (await res.json()) as {
+      type: string;
+      devtoolsFrontendUrl: string;
+    }[];
+
+    // 기본으로 DevTool과 함께 보여줌.
+    const url = data.find(
+      (target) => target.type === "page",
+    ).devtoolsFrontendUrl;
+
+    console.log(url);
+
+    // DevTool 없이 바로 보여주고 싶으면 아래처럼 변경 가능.
+    const liveUrl = new URL(url);
+    liveUrl.searchParams.set("mode", "tab");
+    this.setState({
+      liveUrl: liveUrl.toString(),
+    });
+    return liveUrl;
   }
 
   async closeBrowser() {
