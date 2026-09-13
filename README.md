@@ -348,3 +348,11 @@ R2 저장소 사용하기 -> 매우 쌈!
 ```bash
 $ npx wrangler@latest r2 bucket create <bucket-name>
 ```
+
+## Rag Agents
+
+### Introduction
+
+```bash
+npx create-cloudflare@latest rag-agents --template nomadcoders/nomadclaw/templates/rag-agents
+```
