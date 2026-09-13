@@ -356,3 +356,7 @@ $ npx wrangler@latest r2 bucket create <bucket-name>
 ```bash
 npx create-cloudflare@latest rag-agents --template nomadcoders/nomadclaw/templates/rag-agents
 ```
+
+### toMarkdown
+
+PDF ---> Markdown ---> Chunks ---> Embed Chunks (ID) ---> ID DB
