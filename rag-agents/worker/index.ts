@@ -1,15 +1,39 @@
 import { AIChatAgent } from "@cloudflare/ai-chat";
-import { callable, getAgentByName, routeAgentRequest } from "agents";
+import { getAgentByName, routeAgentRequest } from "agents";
+import { embedMany } from "ai";
+import { createWorkersAI } from "workers-ai-provider";
 
 export class RAGAgent extends AIChatAgent<Env> {
-  @callable()
-  async ingestPdf(buffer: ArrayBuffer, fileName: string, fileType: string) {
-    // Ingest the PDF into the agent's knowledge base
+  async convert(fileName: string, buffer: ArrayBuffer, fileType: string) {
     const result = await this.env.AI.toMarkdown({
       name: fileName,
       blob: new Blob([buffer], { type: fileType ?? "application/pdf" }),
     });
-    console.log(result);
+    if (result.format === "error") return "error";
+    return result.data;
+  }
+
+  async embedChunks(chunks: string[]) {
+    const workersAi = createWorkersAI({ binding: this.env.AI });
+    const { embeddings } = await embedMany({
+      model: workersAi.textEmbeddingModel("@cf/baai/bge-base-en-v1.5"),
+      values: chunks,
+    });
+    // console.log(embeddings[0]);
+    // console.log(embeddings[0].length);
+
+    return embeddings;
+  }
+
+  async ingestPdf(buffer: ArrayBuffer, fileName: string, fileType: string) {
+    // Ingest the PDF into the agent's knowledge base
+    const markdown = await this.convert(fileName, buffer, fileType);
+    if (markdown === "error") {
+      throw new Error("Failed to convert PDF to markdown");
+    }
+    // console.log(markdown.split("\n\n").length);
+    const chunks = markdown.split("\n\n");
+    const embeddings = this.embedChunks(chunks);
   }
 }
 

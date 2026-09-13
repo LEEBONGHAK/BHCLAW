@@ -360,3 +360,11 @@ npx create-cloudflare@latest rag-agents --template nomadcoders/nomadclaw/templat
 ### toMarkdown
 
 PDF ---> Markdown ---> Chunks ---> Embed Chunks (ID) ---> ID DB
+
+### Embeddings
+
+vector db 사용을 위해 아래 명령어로 설치
+
+```bash
+$ npx wrangler@latest vectorize create <db 명> --dimensions=<차원 수> --metric=consine
+```
